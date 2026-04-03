@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/flagskit/flagskit/compare/v0.2.0...v0.2.1) (2026-04-03)
+
+
+### Bug Fixes
+
+* use NODE_AUTH_TOKEN for npm publish in CI ([dff8f43](https://github.com/flagskit/flagskit/commit/dff8f43a704c342667352876de6a4a7487d8238e))
+
 # [0.2.0](https://github.com/flagskit/flagskit/compare/v0.1.1...v0.2.0) (2026-04-03)
 
 
