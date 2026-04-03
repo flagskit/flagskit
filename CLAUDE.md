@@ -27,6 +27,12 @@ pnpm --filter @flagskit/core build         # build one package
 - JSDoc on all public exports
 - Tests in `__tests__/` alongside source
 
+## Git workflow
+
+- **Never commit directly to `main`.** Always create a feature branch and open a PR.
+- Branch naming: `feat/<name>`, `fix/<name>`, `chore/<name>`
+- All commits must follow Conventional Commits (see code style)
+
 ## Never touch
 
 - `pnpm-lock.yaml` — managed by pnpm automatically

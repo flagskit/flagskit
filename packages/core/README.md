@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/icon-64.png" alt="FlagsKit" height="64" />
+</p>
+
 # @flagskit/core
 
 Framework-agnostic feature flag evaluation engine. Zero dependencies.
