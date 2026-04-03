@@ -1,8 +1,12 @@
-# FlagsKit
+<p align="center">
+  <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/wordmark-dark.png" alt="FlagsKit" height="48" />
+</p>
 
-[![npm](https://img.shields.io/npm/v/@flagskit/react)](https://www.npmjs.com/package/@flagskit/react)
-[![CI](https://github.com/flagskit/flagskit/actions/workflows/ci.yml/badge.svg)](https://github.com/flagskit/flagskit/actions)
-[![license](https://img.shields.io/npm/l/@flagskit/react)](./LICENSE)
+<p align="center">
+  <a href="https://www.npmjs.com/package/@flagskit/react"><img src="https://img.shields.io/npm/v/@flagskit/react" alt="npm" /></a>
+  <a href="https://github.com/flagskit/flagskit/actions"><img src="https://github.com/flagskit/flagskit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/flagskit/flagskit/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@flagskit/react" alt="license" /></a>
+</p>
 
 Feature flags for React and TypeScript. Percentage rollout, user targeting, type-safe — no backend required.
 
