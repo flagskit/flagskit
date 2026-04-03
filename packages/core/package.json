@@ -1,11 +1,24 @@
 {
   "name": "@flagskit/core",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Feature flags evaluation engine. Zero dependencies.",
-  "keywords": ["feature-flags", "feature-toggles", "typescript", "rollout", "percentage-rollout", "react", "no-backend"],
+  "keywords": [
+    "feature-flags",
+    "feature-toggles",
+    "typescript",
+    "rollout",
+    "percentage-rollout",
+    "react",
+    "no-backend"
+  ],
   "homepage": "https://github.com/flagskit/flagskit",
-  "repository": { "type": "git", "url": "https://github.com/flagskit/flagskit" },
-  "bugs": { "url": "https://github.com/flagskit/flagskit/issues" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flagskit/flagskit"
+  },
+  "bugs": {
+    "url": "https://github.com/flagskit/flagskit/issues"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -16,7 +29,10 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",

@@ -1,11 +1,24 @@
 {
   "name": "@flagskit/react",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "React bindings for FlagsKit — Provider, hooks, and components.",
-  "keywords": ["feature-flags", "react", "hooks", "typescript", "percentage-rollout", "no-backend", "feature-toggles"],
+  "keywords": [
+    "feature-flags",
+    "react",
+    "hooks",
+    "typescript",
+    "percentage-rollout",
+    "no-backend",
+    "feature-toggles"
+  ],
   "homepage": "https://github.com/flagskit/flagskit",
-  "repository": { "type": "git", "url": "https://github.com/flagskit/flagskit" },
-  "bugs": { "url": "https://github.com/flagskit/flagskit/issues" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flagskit/flagskit"
+  },
+  "bugs": {
+    "url": "https://github.com/flagskit/flagskit/issues"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -16,7 +29,10 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
