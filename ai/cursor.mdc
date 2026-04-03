@@ -1,0 +1,141 @@
+---
+description: FlagsKit feature flags — API patterns and usage rules
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: false
+---
+
+# FlagsKit — Feature Flags
+
+## Install
+
+```bash
+pnpm add @flagskit/react
+```
+
+## Setup — always use createFlagKit
+
+Define your schema and create typed bindings once, export them, import everywhere.
+
+```typescript
+// flags.ts
+import { createFlagKit, defineFlags } from '@flagskit/react'
+
+type AppFlags = {
+  'new-checkout': boolean
+  'plan': 'free' | 'pro' | 'enterprise'
+  'max-upload-mb': number
+}
+
+export const { FlagProvider, useFlag, useFlags, Feature } = createFlagKit<AppFlags>(
+  defineFlags<AppFlags>({
+    'new-checkout': {
+      defaultValue: false,
+      rules: [
+        { match: { role: 'beta' }, value: true },
+        { percentage: 20, value: true },
+      ],
+    },
+    'plan': {
+      defaultValue: 'free',
+      rules: [{ match: { tier: 'pro' }, value: 'pro' }],
+    },
+    'max-upload-mb': {
+      defaultValue: 10,
+      rules: [{ match: { tier: 'pro' }, value: 100 }],
+    },
+  }),
+)
+```
+
+## Provider — wrap the app once
+
+```tsx
+import { FlagProvider } from './flags'
+
+<FlagProvider context={{ userId: user.id, role: user.role, tier: user.tier }}>
+  <App />
+</FlagProvider>
+```
+
+FlagContext shape:
+
+```typescript
+{
+  userId?: string   // required for percentage rollout
+  env?: string
+  [key: string]: string | number | boolean | undefined
+}
+```
+
+## useFlag — single flag value
+
+```typescript
+import { useFlag } from './flags'
+
+const isNew   = useFlag('new-checkout')   // boolean
+const plan    = useFlag('plan')           // 'free' | 'pro' | 'enterprise'
+const maxSize = useFlag('max-upload-mb')  // number
+```
+
+## useFlags — multiple flags
+
+```typescript
+import { useFlags } from './flags'
+
+const { 'new-checkout': isNew, 'plan': plan } = useFlags(['new-checkout', 'plan'])
+```
+
+## Feature component
+
+```tsx
+import { Feature } from './flags'
+
+// Boolean — show/hide
+<Feature flag="new-checkout" fallback={<OldCheckout />}>
+  <NewCheckout />
+</Feature>
+
+// Non-boolean — render prop
+<Feature flag="plan">
+  {(plan) => <PlanBadge plan={plan} />}
+</Feature>
+
+<Feature flag="max-upload-mb">
+  {(mb) => <Uploader maxMB={mb} />}
+</Feature>
+```
+
+## Rules
+
+Rules evaluate top-to-bottom. First matching rule wins.
+
+```typescript
+rules: [
+  // Equality match — all conditions are AND
+  { match: { role: 'admin' }, value: true },
+
+  // Percentage rollout — needs userId in context, deterministic per user
+  { percentage: 20, value: true },
+
+  // Combined — both must pass
+  { match: { plan: 'pro' }, percentage: 50, value: true },
+]
+```
+
+## Overrides via adapter
+
+```typescript
+import { jsonAdapter } from '@flagskit/react'
+
+<FlagProvider
+  context={{ userId: user.id }}
+  adapter={jsonAdapter({ overrides: { 'new-checkout': true } })}
+>
+```
+
+## Rules
+
+- Always import from `'./flags'` (your app's typed exports), not from `@flagskit/react` directly
+- `userId` in context is required for percentage rollout to work
+- `defaultValue` type must match the flag's type in `AppFlags`
+- Rules are AND logic — all conditions in `match` must be true
