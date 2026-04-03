@@ -1,6 +1,6 @@
 {
   "name": "@flagskit/react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React bindings for FlagsKit — Provider, hooks, and components.",
   "keywords": ["feature-flags", "react", "hooks", "typescript", "percentage-rollout", "no-backend", "feature-toggles"],
   "homepage": "https://github.com/flagskit/flagskit",

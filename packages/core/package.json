@@ -1,6 +1,6 @@
 {
   "name": "@flagskit/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Feature flags evaluation engine. Zero dependencies.",
   "keywords": ["feature-flags", "feature-toggles", "typescript", "rollout", "percentage-rollout", "react", "no-backend"],
   "homepage": "https://github.com/flagskit/flagskit",
