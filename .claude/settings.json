@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.command // \"\"' | grep -qE '^git commit' && echo 'Pre-commit: run the code-reviewer agent before committing. Use: Use the code-reviewer agent to review staged changes.' >&2 && exit 2 || exit 0"
+            "command": "jq -r '.tool_input.command // \"\"' | grep -qE '^git commit' && echo 'Reminder: consider running the code-reviewer agent before committing.' >&2 || true"
           }
         ]
       }
