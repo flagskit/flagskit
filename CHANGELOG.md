@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.1.1](https://github.com/flagskit/flagskit/compare/v0.1.0...v0.1.1) (2026-04-03)
+
 ## 0.1.0 (2026-04-03)
 
 ### Features
