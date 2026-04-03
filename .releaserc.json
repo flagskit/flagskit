@@ -1,0 +1,23 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/changelog", { "changelogFile": "CHANGELOG.md" }],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "node scripts/set-version.js ${nextRelease.version} && pnpm build",
+        "publishCmd": "pnpm --filter @flagskit/core publish --no-git-checks && pnpm --filter @flagskit/react publish --no-git-checks"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["CHANGELOG.md", "packages/core/package.json", "packages/react/package.json"],
+        "message": "chore: release v${nextRelease.version}\n\n${nextRelease.notes}"
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}
