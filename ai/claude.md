@@ -13,7 +13,7 @@ type AppFlags = {
   'plan': 'free' | 'pro' | 'enterprise'
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature } = createFlagKit<AppFlags>(
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>(
   defineFlags<AppFlags>({
     'new-checkout': {
       defaultValue: false,
@@ -49,6 +49,32 @@ const plan  = useFlag('plan')          // 'free' | 'pro' | 'enterprise'
 
 // Render prop for non-boolean
 <Feature flag="plan">{(plan) => <Badge plan={plan} />}</Feature>
+```
+
+## Variant component
+
+```tsx
+// Multivariate — render different UI per flag value
+<Variant
+  flag="plan"
+  variants={{ free: <FreePlan />, pro: <ProPlan />, enterprise: <EnterprisePlan /> }}
+  fallback={<DefaultPlan />}
+/>
+```
+
+## Adapters
+
+```typescript
+import { jsonAdapter, httpAdapter } from '@flagskit/react'
+
+// Static overrides — dev/testing
+adapter={jsonAdapter({ overrides: { 'new-checkout': true } })}
+
+// Remote flags from backend
+adapter={httpAdapter({ url: '/api/flags' })}
+
+// With polling
+adapter={httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })}
 ```
 
 ## Rules

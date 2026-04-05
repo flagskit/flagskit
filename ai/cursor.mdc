@@ -26,7 +26,7 @@ type AppFlags = {
   'max-upload-mb': number
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature } = createFlagKit<AppFlags>(
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>(
   defineFlags<AppFlags>({
     'new-checkout': {
       defaultValue: false,
@@ -122,16 +122,43 @@ rules: [
 ]
 ```
 
-## Overrides via adapter
+## Variant component
+
+Renders a different subtree per flag value. Use instead of chained `if/else` for multivariate flags:
+
+```tsx
+import { Variant } from './flags'
+
+<Variant
+  flag="plan"
+  variants={{
+    free:       <FreeDashboard />,
+    pro:        <ProDashboard />,
+    enterprise: <EnterpriseDashboard />,
+  }}
+  fallback={<DefaultDashboard />}
+/>
+```
+
+## Adapters
 
 ```typescript
-import { jsonAdapter } from '@flagskit/react'
+import { jsonAdapter, httpAdapter } from '@flagskit/react'
 
-<FlagProvider
-  context={{ userId: user.id }}
-  adapter={jsonAdapter({ overrides: { 'new-checkout': true } })}
->
+// Static overrides — local dev and testing
+adapter={jsonAdapter({ overrides: { 'new-checkout': true } })}
+
+// Remote — fetch from your backend
+adapter={httpAdapter({ url: '/api/flags' })}
+
+// Remote with polling every 60s
+adapter={httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })}
+
+// Remote with auth
+adapter={httpAdapter({ url: '/api/flags', headers: { Authorization: `Bearer ${token}` } })}
 ```
+
+The endpoint must return `{ "flag-name": value, ... }`. Poll errors are silently ignored.
 
 ## Rules
 

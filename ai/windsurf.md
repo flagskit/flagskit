@@ -13,7 +13,7 @@ type AppFlags = {
   'variant': 'a' | 'b' | 'c'
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature } = createFlagKit<AppFlags>(
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>(
   defineFlags<AppFlags>({
     'feature-name': {
       defaultValue: false,
@@ -48,6 +48,32 @@ const variant   = useFlag('variant')        // 'a' | 'b' | 'c'
 
 // Component — render prop
 <Feature flag="variant">{(v) => <Component variant={v} />}</Feature>
+```
+
+## Variant component
+
+```tsx
+// Multivariate — renders different UI per flag value
+<Variant
+  flag="variant"
+  variants={{ a: <VariantA />, b: <VariantB />, c: <VariantC /> }}
+  fallback={<Default />}
+/>
+```
+
+## Adapters
+
+```typescript
+import { jsonAdapter, httpAdapter } from '@flagskit/react'
+
+// Static overrides — dev/testing
+adapter={jsonAdapter({ overrides: { 'feature-name': true } })}
+
+// Remote flags from your backend
+adapter={httpAdapter({ url: '/api/flags' })}
+
+// With polling every 60 seconds
+adapter={httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })}
 ```
 
 ## Key rules
