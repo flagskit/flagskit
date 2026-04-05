@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/icon-64.png" alt="FlagsKit" height="64" />
+  <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/banner-core.png" alt="FlagsKit" width="100%" />
 </p>
 
 # @flagskit/core

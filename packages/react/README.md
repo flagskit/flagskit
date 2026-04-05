@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/wordmark-dark.png" alt="FlagsKit" height="48" />
+  <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/banner-react.png" alt="FlagsKit" width="100%" />
 </p>
 
 <p align="center">
