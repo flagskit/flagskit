@@ -4,11 +4,12 @@ import { FlagProvider as RawFlagProvider } from './provider'
 import { useFlag as rawUseFlag } from './use-flag'
 import { useFlags as rawUseFlags } from './use-flags'
 import { Feature as RawFeature } from './feature'
+import { Variant as RawVariant } from './variant'
 
 /**
  * Create a fully typed set of React bindings bound to your flag schema.
  *
- * Returns typed FlagProvider, useFlag, useFlags, and Feature — no explicit
+ * Returns typed FlagProvider, useFlag, useFlags, Feature, and Variant — no explicit
  * type parameters needed at the call site.
  *
  * @example
@@ -65,5 +66,12 @@ export function createFlagKit<T extends FlagSchema>(config: FlagsConfig<T>) {
     children: ReactNode | ((value: T[K]) => ReactNode)
   }) => ReactElement | null
 
-  return { FlagProvider, useFlag, useFlags, Feature }
+  /** Render a different subtree for each possible flag value. */
+  const Variant = RawVariant as unknown as <K extends keyof T>(props: {
+    flag: K
+    variants: Record<string, ReactNode>
+    fallback?: ReactNode
+  }) => ReactElement | null
+
+  return { FlagProvider, useFlag, useFlags, Feature, Variant }
 }

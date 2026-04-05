@@ -60,14 +60,14 @@ Goal: publishable to npm, usable in a real React app.
 
 ## v0.2.0 — Adapters & Variant
 
-- [ ] HTTP adapter (fetch + polling interval)
+- [x] HTTP adapter (fetch + polling interval)
 - [ ] Env adapter (reads FF_* environment variables)
 - [ ] compose() to merge multiple adapters (priority order)
-- [ ] `<Variant>` component (render map by flag value)
+- [x] `<Variant>` component (render map by flag value)
 - [ ] Evaluation events (onEvaluate callback)
 - [ ] Error boundary in Feature component (errorFallback prop)
 - [ ] evaluateSync() imperative API (no React)
-- [ ] Bundle size audit — target <3KB gzipped for core
+- [x] Bundle size audit — core 1.2KB gzip, react 1.1KB gzip (well under target)
 
 ---
 

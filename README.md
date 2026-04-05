@@ -6,6 +6,9 @@
   <a href="https://www.npmjs.com/package/@flagskit/react"><img src="https://img.shields.io/npm/v/@flagskit/react" alt="npm" /></a>
   <a href="https://github.com/flagskit/flagskit/actions"><img src="https://github.com/flagskit/flagskit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@flagskit/react" alt="license" /></a>
+  <img src="https://img.shields.io/badge/core-1.2KB-blue" alt="core bundle size" />
+  <img src="https://img.shields.io/badge/react-1.1KB-blue" alt="react bundle size" />
+  <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="zero dependencies" />
 </p>
 
 Feature flags for React and TypeScript. Percentage rollout, user targeting, type-safe — no backend required.
@@ -139,6 +142,21 @@ rules: [
 ]
 ```
 
+### `<Variant>` — render a different UI per value
+
+Perfect for A/B tests and multivariate experiments:
+
+```tsx
+<Variant
+  flag="pricing-model"
+  variants={{
+    legacy: <LegacyPricing />,
+    v2:     <PricingV2 />,
+    v3:     <PricingV3 />,
+  }}
+/>
+```
+
 ### Adapter pattern — start simple, grow as needed
 
 ```typescript
@@ -151,7 +169,19 @@ import { jsonAdapter } from '@flagskit/core'
 >
 ```
 
-When you need a remote source, swap the adapter. Your components stay the same.
+Load flags from your own backend — swap the adapter, keep your components:
+
+```typescript
+import { httpAdapter } from '@flagskit/core'
+
+<FlagProvider
+  context={{ userId: user.id }}
+  adapter={httpAdapter({ url: '/api/flags' })}
+>
+
+// With polling — flags refresh every 60 seconds without a page reload
+adapter={httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })}
+```
 
 ```
 Day 1:   JSON / env vars        no infrastructure
@@ -211,6 +241,32 @@ Conditional rendering based on a flag value.
 - Boolean `false` → renders `fallback` (or nothing)
 - Non-boolean → renders children as render prop: `{(value) => <Component />}`
 
+### `<Variant flag variants fallback?>`
+
+Render a different subtree for each possible flag value. Ideal for A/B tests with more than two variants.
+
+```tsx
+<Variant
+  flag="pricing-model"
+  variants={{ legacy: <LegacyPricing />, v2: <PricingV2 /> }}
+  fallback={<DefaultPricing />}
+/>
+```
+
+### `jsonAdapter({ overrides })`
+
+Static adapter — forces specific flag values. Useful for local development, tests, and CI.
+
+### `httpAdapter({ url, refreshInterval?, headers? })`
+
+Fetches flag overrides from a JSON endpoint. Optionally polls on a fixed interval so flags stay fresh without a page reload.
+
+| Option | Type | Description |
+|---|---|---|
+| `url` | `string` | Endpoint returning `{ flagName: value }` JSON |
+| `refreshInterval` | `number` | Polling interval in ms (omit to disable) |
+| `headers` | `Record<string, string>` | Extra request headers (e.g. `Authorization`) |
+
 ---
 
 ## Packages
@@ -224,12 +280,10 @@ Conditional rendering based on a flag value.
 
 ---
 
-## What v0.1 does not include
+## What's not included yet
 
-- Real-time flag updates — polling/SSE _(v0.2)_
-- HTTP adapter _(v0.2)_
-- Next.js SSR helpers _(v0.3)_
-- DevTools panel _(v0.4)_
+- Next.js SSR helpers (`@flagskit/next`) _(v0.3)_
+- DevTools panel (`@flagskit/devtools`) _(v0.4)_
 - Advanced match operators: `$in`, `$gt`, etc _(v0.5)_
 
 ---
