@@ -39,6 +39,13 @@ export type FlagsConfig<T extends FlagSchema> = {
 /** Adapter interface for external flag sources */
 export type FlagAdapter<T extends FlagSchema = FlagSchema> = {
   getOverrides(): Partial<T> | Promise<Partial<T>>
+  /**
+   * Optional subscription for real-time updates (e.g. polling adapters).
+   * Called once by the provider after the initial load.
+   * Should invoke callback whenever new overrides are available.
+   * Must return an unsubscribe function.
+   */
+  subscribe?: (callback: (overrides: Partial<T>) => void) => () => void
 }
 
 /** Result of evaluating a single flag */
