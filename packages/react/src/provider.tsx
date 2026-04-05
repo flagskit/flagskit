@@ -35,8 +35,8 @@ export function FlagProvider<T extends FlagSchema>({
     }
 
     let cancelled = false
-    const result = adapter.getOverrides()
 
+    const result = adapter.getOverrides()
     if (result instanceof Promise) {
       result.then((v) => {
         if (!cancelled) setOverrides(v)
@@ -45,8 +45,13 @@ export function FlagProvider<T extends FlagSchema>({
       setOverrides(result)
     }
 
+    const unsubscribe = adapter.subscribe?.((v) => {
+      if (!cancelled) setOverrides(v)
+    })
+
     return () => {
       cancelled = true
+      unsubscribe?.()
     }
   }, [adapter])
 
