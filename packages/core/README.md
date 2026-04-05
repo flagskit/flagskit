@@ -4,30 +4,27 @@
 
 # @flagskit/core
 
-Framework-agnostic feature flag evaluation engine. Zero dependencies.
+Feature flag evaluation engine. Zero dependencies. Works in React, Node.js, Edge, and any other runtime.
 
-Used internally by `@flagskit/react`. If you're building a React app, install that instead:
+**If you're building a React app, install [`@flagskit/react`](https://www.npmjs.com/package/@flagskit/react) instead** — it includes everything from core plus Provider, hooks, and components.
 
-```bash
-pnpm add @flagskit/react
-```
-
-## When to use `@flagskit/core` directly
-
-- Non-React frameworks (Vue, Svelte, vanilla JS)
-- Node.js / Edge runtime (server-side evaluation)
-- Building your own framework adapter
-
-## Install
+Use `@flagskit/core` directly when:
+- You're integrating with a non-React framework (Vue, Svelte, vanilla JS)
+- You need server-side evaluation (Node.js, Edge runtime)
+- You're building your own framework adapter
 
 ```bash
 pnpm add @flagskit/core
+# or
+npm install @flagskit/core
 ```
+
+---
 
 ## Usage
 
 ```typescript
-import { defineFlags, evaluate, evaluateAll, jsonAdapter } from '@flagskit/core'
+import { defineFlags, evaluateAll, jsonAdapter } from '@flagskit/core'
 
 type AppFlags = {
   'new-checkout': boolean
@@ -42,28 +39,94 @@ const config = defineFlags<AppFlags>({
       { percentage: 20, value: true },
     ],
   },
-  'plan': { defaultValue: 'free' },
+  'plan': {
+    defaultValue: 'free',
+    rules: [{ match: { tier: 'pro' }, value: 'pro' }],
+  },
 })
 
-// Evaluate a single flag
+// Evaluate all flags
+const flags = evaluateAll(config, { userId: 'user-123', role: 'beta' })
+// { 'new-checkout': true, 'plan': 'free' }
+
+// Evaluate a single flag with full result
 const result = evaluate(config, 'new-checkout', { userId: 'user-123', role: 'beta' })
 // { value: true, source: 'rule', ruleIndex: 0 }
-
-// Evaluate all flags at once
-const flags = evaluateAll(config, { userId: 'user-123', plan: 'pro' })
-// { 'new-checkout': false, 'plan': 'free' }
 ```
+
+---
 
 ## API
 
-- `defineFlags<T>(config)` — typed config factory
-- `evaluate(config, flagName, context, overrides?)` — single flag evaluation
-- `evaluateAll(config, context, overrides?)` — all flags at once
-- `matchRule(match, context)` — check if conditions match
-- `murmurhash3(key, seed?)` — consistent hash for percentage rollout
-- `jsonAdapter({ overrides })` — static override adapter
+### `defineFlags<T>(config)`
 
-Full documentation: [github.com/flagskit/flagskit](https://github.com/flagskit/flagskit)
+Type-safe config factory. Validates flag definitions against your schema at compile time.
+
+```typescript
+const config = defineFlags<AppFlags>({ ... })
+```
+
+### `evaluate(config, flagName, context, overrides?)`
+
+Evaluate a single flag. Returns `{ value, source, ruleIndex? }`.
+
+- `source` is `'override'`, `'rule'`, or `'default'`
+
+### `evaluateAll(config, context, overrides?)`
+
+Evaluate all flags at once. Returns `{ [flagName]: value }`.
+
+### `matchRule(match, context)`
+
+Check if a match condition is satisfied by the context. All conditions use AND logic.
+
+### `murmurhash3(key, seed?)`
+
+Inline MurmurHash3 (32-bit). Used for consistent percentage rollout — same `flagName + userId` always produces the same hash.
+
+### `jsonAdapter({ overrides })`
+
+Static adapter — returns fixed overrides synchronously. Useful for local dev, testing, and CI.
+
+```typescript
+const adapter = jsonAdapter({ overrides: { 'new-checkout': true } })
+```
+
+### `httpAdapter({ url, refreshInterval?, headers? })`
+
+Fetches flag overrides from a JSON endpoint. Optionally polls on a fixed interval.
+
+```typescript
+// Fetch once
+const adapter = httpAdapter({ url: '/api/flags' })
+
+// With polling every 60 seconds
+const adapter = httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })
+
+// With auth
+const adapter = httpAdapter({
+  url: '/api/flags',
+  headers: { Authorization: `Bearer ${token}` },
+})
+```
+
+The endpoint must return a flat JSON object: `{ "flag-name": value, ... }`. Poll errors are silently ignored.
+
+---
+
+## Types
+
+```typescript
+type FlagValue   = boolean | string | number | Record<string, unknown>
+type FlagContext  = { userId?: string; env?: string; [key: string]: string | number | boolean | undefined }
+type FlagRule<V> = { match?: MatchCondition; percentage?: number; value?: V }
+type FlagAdapter<T> = {
+  getOverrides(): Partial<T> | Promise<Partial<T>>
+  subscribe?: (callback: (overrides: Partial<T>) => void) => () => void
+}
+```
+
+---
 
 ## License
 
