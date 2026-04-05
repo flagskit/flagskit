@@ -1,17 +1,21 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/wordmark-dark.png" alt="FlagsKit" height="48" />
+  <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/banner-react.png" alt="FlagsKit" width="100%" />
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@flagskit/react"><img src="https://img.shields.io/npm/v/@flagskit/react" alt="npm" /></a>
   <a href="https://github.com/flagskit/flagskit/actions"><img src="https://github.com/flagskit/flagskit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://github.com/flagskit/flagskit/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@flagskit/react" alt="license" /></a>
+  <img src="https://img.shields.io/badge/react-1.1KB-blue" alt="1.1KB gzipped" />
+  <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="zero dependencies" />
 </p>
 
-Feature flags for React and TypeScript. Percentage rollout, user targeting, type-safe — no backend required.
+React bindings for FlagsKit — Provider, hooks, and components. Percentage rollout, user targeting, type-safe. No backend required.
 
 ```bash
 pnpm add @flagskit/react
+# or
+npm install @flagskit/react
 ```
 
 ---
@@ -22,7 +26,7 @@ pnpm add @flagskit/react
 
 ```typescript
 // flags.ts
-import { defineFlags, createFlagKit } from '@flagskit/react'
+import { createFlagKit, defineFlags } from '@flagskit/react'
 
 type AppFlags = {
   'new-checkout': boolean
@@ -30,25 +34,26 @@ type AppFlags = {
   'max-upload-mb': number
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature } = createFlagKit<AppFlags>(
-  defineFlags<AppFlags>({
-    'new-checkout': {
-      defaultValue: false,
-      rules: [
-        { match: { role: 'beta' }, value: true },   // beta users always get it
-        { percentage: 20, value: true },             // 20% of everyone else
-      ],
-    },
-    'pricing-model': {
-      defaultValue: 'legacy',
-      rules: [{ match: { country: 'US' }, value: 'v2' }],
-    },
-    'max-upload-mb': {
-      defaultValue: 10,
-      rules: [{ match: { plan: 'pro' }, value: 100 }],
-    },
-  }),
-)
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } =
+  createFlagKit<AppFlags>(
+    defineFlags<AppFlags>({
+      'new-checkout': {
+        defaultValue: false,
+        rules: [
+          { match: { role: 'beta' }, value: true },
+          { percentage: 20, value: true },
+        ],
+      },
+      'pricing-model': {
+        defaultValue: 'legacy',
+        rules: [{ match: { country: 'US' }, value: 'v2' }],
+      },
+      'max-upload-mb': {
+        defaultValue: 10,
+        rules: [{ match: { plan: 'pro' }, value: 100 }],
+      },
+    }),
+  )
 ```
 
 **2. Wrap your app**
@@ -66,97 +71,30 @@ function App() {
 }
 ```
 
-**3. Use anywhere — fully typed, no generics**
+**3. Use anywhere — fully typed**
 
 ```tsx
-import { useFlag, Feature } from './flags'
+import { useFlag, Feature, Variant } from './flags'
 
 // Hook — return type inferred from your schema
-function CheckoutButton() {
-  const isNew = useFlag('new-checkout')  // boolean ✓
-  return isNew ? <NewCheckout /> : <OldCheckout />
-}
+const isNew = useFlag('new-checkout')   // boolean
+const model = useFlag('pricing-model')  // 'legacy' | 'v2' | 'v3'
 
-// Component — declarative show/hide
-function Page() {
-  return (
-    <Feature flag="new-checkout" fallback={<OldCheckout />}>
-      <NewCheckout />
-    </Feature>
-  )
-}
+// Boolean flag — show/hide
+<Feature flag="new-checkout" fallback={<OldCheckout />}>
+  <NewCheckout />
+</Feature>
 
-// Render prop — access the value directly
-function Uploader() {
-  return (
-    <Feature flag="max-upload-mb">
-      {(maxMB) => <FileUpload limit={maxMB} />}
-    </Feature>
-  )
-}
-```
+// Render prop — access the value
+<Feature flag="max-upload-mb">
+  {(maxMB) => <FileUpload limit={maxMB} />}
+</Feature>
 
-TypeScript catches mistakes at compile time:
-
-```typescript
-useFlag('new-checkout')           // boolean ✓
-useFlag('pricing-model')          // 'legacy' | 'v2' | 'v3' ✓
-useFlag('typo')                   // TypeScript error ✓
-useFlag('new-checkout') + 1       // TypeScript error ✓
-```
-
----
-
-## Why FlagsKit
-
-Most feature flag tools force you to choose between two bad options:
-
-- **Heavyweight platforms** (LaunchDarkly, Unleash, Flagsmith) — you pay or deploy a server just to ship a feature behind a flag
-- **Lightweight wrappers** (`flagged`, `react-feature-flags`) — basically `createContext` with no rollout, no targeting, no real types
-
-FlagsKit sits in the middle: real feature flag functionality, zero infrastructure.
-
-### Percentage rollout without a backend
-
-Uses MurmurHash3 to consistently assign users to buckets client-side:
-
-```
-hash(flagName + userId) % 100 < percentage → enabled
-```
-
-Same user always sees the same variant. No server needed.
-
-```typescript
-rules: [{ percentage: 10, value: true }]  // 10% of users
-```
-
-### Rules + percentage together
-
-```typescript
-rules: [
-  // Only 30% of pro users get the new dashboard
-  { match: { plan: 'pro' }, percentage: 30, value: true },
-]
-```
-
-### Adapter pattern — start simple, grow as needed
-
-```typescript
-import { jsonAdapter } from '@flagskit/core'
-
-// Override any flag — useful for local dev and testing
-<FlagProvider
-  context={{ userId: user.id }}
-  adapter={jsonAdapter({ overrides: { 'new-checkout': true } })}
->
-```
-
-When you need a remote source, swap the adapter. Your components stay the same.
-
-```
-Day 1:   JSON / env vars        no infrastructure
-Month 3: Your own HTTP API      custom backend
-Year 1:  Unleash / LaunchDarkly enterprise migration
+// Multivariate — render per value
+<Variant
+  flag="pricing-model"
+  variants={{ legacy: <LegacyPricing />, v2: <PricingV2 />, v3: <PricingV3 /> }}
+/>
 ```
 
 ---
@@ -165,11 +103,13 @@ Year 1:  Unleash / LaunchDarkly enterprise migration
 
 ### `createFlagKit<T>(config)`
 
-Primary API. Creates typed bindings for your flag schema. Returns `{ FlagProvider, useFlag, useFlags, Feature }`.
+Primary API. Creates a fully typed set of React bindings bound to your flag schema. Import from `'./flags'` in your app — never import hooks directly from `@flagskit/react`.
+
+Returns: `{ FlagProvider, useFlag, useFlags, Feature, Variant }`
 
 ### `defineFlags<T>(config)`
 
-Type-safe config factory. Validates your flag definitions against the schema at compile time.
+Type-safe config factory. Validates flag definitions against your schema at compile time.
 
 ### `<FlagProvider context? adapter?>`
 
@@ -190,11 +130,17 @@ type FlagContext = {
 
 ### `useFlag(flagName)`
 
-Returns the evaluated value of a single flag. Type inferred from your schema.
+Returns the evaluated value of a single flag. Return type inferred from your schema.
+
+```typescript
+const isNew = useFlag('new-checkout')   // boolean
+const model = useFlag('pricing-model')  // 'legacy' | 'v2' | 'v3'
+const oops  = useFlag('typo')          // TypeScript error
+```
 
 ### `useFlags([...flagNames])`
 
-Returns an object with values for multiple flags.
+Returns an object with values for multiple flags at once.
 
 ```typescript
 const { 'new-checkout': isNew, 'pricing-model': model } = useFlags([
@@ -208,53 +154,87 @@ const { 'new-checkout': isNew, 'pricing-model': model } = useFlags([
 Conditional rendering based on a flag value.
 
 - Boolean `true` → renders children
-- Boolean `false` → renders `fallback` (or nothing)
+- Boolean `false` → renders `fallback` (or null)
 - Non-boolean → renders children as render prop: `{(value) => <Component />}`
 
----
+```tsx
+<Feature flag="new-checkout" fallback={<OldCheckout />}>
+  <NewCheckout />
+</Feature>
 
-## Packages
-
-| Package | Description |
-|---|---|
-| `@flagskit/core` | Evaluation engine, types, adapters. Zero dependencies. Works in Node, Edge, browser. |
-| `@flagskit/react` | Provider, hooks, components. Peer dep: `react >=18`. |
-| `@flagskit/next` | SSR support, Server Components, middleware. _(coming in v0.3)_ |
-| `@flagskit/devtools` | Inspect and override flags at runtime. _(coming in v0.4)_ |
-
----
-
-## What v0.1 does not include
-
-- Real-time flag updates — polling/SSE _(v0.2)_
-- HTTP adapter _(v0.2)_
-- Next.js SSR helpers _(v0.3)_
-- DevTools panel _(v0.4)_
-- Advanced match operators: `$in`, `$gt`, etc _(v0.5)_
-
----
-
-## Using with AI assistants
-
-FlagsKit ships ready-made rules files for all major AI coding tools. Add them once — your AI will always generate correct FlagsKit code.
-
-**Universal (`AGENTS.md`)** — works with Claude Code, Cursor, Copilot, Windsurf, Cline, Gemini CLI, Zed, Warp, and more:
-
-```bash
-curl -o AGENTS.md \
-  https://raw.githubusercontent.com/flagskit/flagskit/main/AGENTS.md
+<Feature flag="max-upload-mb">
+  {(maxMB) => <Uploader limit={maxMB} />}
+</Feature>
 ```
 
-**Tool-specific files** (if you need per-tool customization):
+### `<Variant flag variants fallback?>`
 
-| Tool | Command |
-|---|---|
-| Cursor | `curl -o .cursor/rules/flagskit.mdc https://raw.githubusercontent.com/flagskit/flagskit/main/ai/cursor.mdc` |
-| GitHub Copilot | `curl -o .github/copilot-instructions.md https://raw.githubusercontent.com/flagskit/flagskit/main/ai/copilot.md` |
-| Claude Code | `curl -o CLAUDE.md https://raw.githubusercontent.com/flagskit/flagskit/main/ai/claude.md` |
-| Windsurf | `curl -o .windsurf/rules/flagskit.md https://raw.githubusercontent.com/flagskit/flagskit/main/ai/windsurf.md` |
+Renders a different subtree for each possible flag value. Ideal for A/B tests and multivariate experiments.
 
-See [`ai/`](./ai/) for all files.
+```tsx
+<Variant
+  flag="pricing-model"
+  variants={{
+    legacy: <LegacyPricing />,
+    v2:     <PricingV2 />,
+    v3:     <PricingV3 />,
+  }}
+  fallback={<DefaultPricing />}
+/>
+```
+
+### `jsonAdapter({ overrides })`
+
+Static adapter — forces specific flag values. Useful for local development, tests, and CI.
+
+```typescript
+import { jsonAdapter } from '@flagskit/react'
+
+<FlagProvider
+  adapter={jsonAdapter({ overrides: { 'new-checkout': true } })}
+>
+```
+
+### `httpAdapter({ url, refreshInterval?, headers? })`
+
+Fetches flag overrides from a JSON endpoint. Optionally polls so flags stay fresh without a page reload.
+
+```typescript
+import { httpAdapter } from '@flagskit/react'
+
+// Fetch once on mount
+<FlagProvider adapter={httpAdapter({ url: '/api/flags' })}>
+
+// With polling every 60 seconds
+<FlagProvider adapter={httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })}>
+
+// With auth header
+<FlagProvider adapter={httpAdapter({
+  url: '/api/flags',
+  headers: { Authorization: `Bearer ${token}` },
+})}>
+```
+
+The endpoint must return a flat JSON object: `{ "flag-name": value, ... }`.
+
+---
+
+## Rules
+
+```typescript
+rules: [
+  // Equality match — all conditions AND
+  { match: { role: 'admin' }, value: true },
+
+  // Percentage rollout — deterministic per userId
+  { percentage: 20, value: true },
+
+  // Combined — both conditions must pass
+  { match: { plan: 'pro' }, percentage: 30, value: true },
+]
+```
+
+Rules evaluate top-to-bottom. First matching rule wins.
 
 ---
 
