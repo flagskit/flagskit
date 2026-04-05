@@ -16,7 +16,7 @@ type AppFlags = {
   'max-upload-mb': number
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature } = createFlagKit<AppFlags>(
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>(
   defineFlags<AppFlags>({
     'new-checkout': {
       defaultValue: false,
@@ -105,7 +105,29 @@ rules: [
 ]
 ```
 
-## Overrides (dev/testing)
+## Variant component
+
+For A/B tests and multivariate experiments — renders a different subtree per flag value:
+
+```tsx
+import { Variant } from './flags'
+
+<Variant
+  flag="plan"
+  variants={{
+    free:       <FreeDashboard />,
+    pro:        <ProDashboard />,
+    enterprise: <EnterpriseDashboard />,
+  }}
+  fallback={<LoadingDashboard />}
+/>
+```
+
+Use `<Variant>` instead of chained `if/else` or multiple `<Feature>` blocks when a flag has more than two meaningful values.
+
+## Adapters
+
+### jsonAdapter — static overrides (dev/testing)
 
 ```typescript
 import { jsonAdapter } from '@flagskit/react'
@@ -115,6 +137,30 @@ import { jsonAdapter } from '@flagskit/react'
   adapter={jsonAdapter({ overrides: { 'new-checkout': true } })}
 >
 ```
+
+### httpAdapter — remote flags from your backend
+
+```typescript
+import { httpAdapter } from '@flagskit/react'
+
+// Fetch once
+<FlagProvider
+  context={{ userId: user.id }}
+  adapter={httpAdapter({ url: '/api/flags' })}
+>
+
+// With polling — flags refresh every 60s without a page reload
+<FlagProvider
+  context={{ userId: user.id }}
+  adapter={httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })}
+>
+
+// With auth header
+adapter={httpAdapter({ url: '/api/flags', headers: { Authorization: `Bearer ${token}` } })}
+```
+
+The endpoint must return a flat JSON object: `{ "flag-name": value, ... }`.
+Poll errors are silently ignored — last known values stay active.
 
 ## Rules to follow
 
