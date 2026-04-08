@@ -7,19 +7,17 @@ This project uses FlagsKit (`@flagskit/react`) for feature flags.
 Feature flags are defined once in `flags.ts` using `createFlagKit`:
 
 ```typescript
-import { createFlagKit, defineFlags } from '@flagskit/react'
+import { createFlagKit } from '@flagskit/react'
 
 type AppFlags = {
   'feature-name': boolean
   'variant': 'a' | 'b'
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>(
-  defineFlags<AppFlags>({
-    'feature-name': { defaultValue: false },
-    'variant': { defaultValue: 'a' },
-  }),
-)
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>({
+  'feature-name': { defaultValue: false },
+  'variant': { defaultValue: 'a' },
+})
 ```
 
 ## Using flags in components
@@ -44,7 +42,7 @@ const isEnabled = useFlag('feature-name')  // boolean
 rules: [
   { match: { role: 'admin' }, value: true },  // user targeting
   { percentage: 20, value: true },             // 20% rollout (needs userId in context)
-  { match: { plan: 'pro' }, percentage: 50 },  // combined
+  { match: { plan: 'pro' }, percentage: 50, value: true },  // combined
 ]
 ```
 

@@ -10,13 +10,31 @@
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="zero dependencies" />
 </p>
 
-React bindings for FlagsKit — Provider, hooks, and components. Percentage rollout, user targeting, type-safe. No backend required.
+Type-safe feature flags for React — percentage rollout and user targeting without any backend.
 
 ```bash
-pnpm add @flagskit/react
-# or
 npm install @flagskit/react
 ```
+
+> **[Try the live example on StackBlitz](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)**
+
+---
+
+## Why FlagsKit
+
+Most tools force you to choose:
+
+- **SaaS platforms** (LaunchDarkly, Unleash, Flagsmith) — need their cloud service or a self-hosted server
+- **Context wrappers** (`flagged` and similar) — boolean flags only, no rollout, no targeting
+
+FlagsKit sits in the middle: real rollout logic, no external service required.
+
+|  | SaaS platforms | Context wrappers | **FlagsKit** |
+|---|---|---|---|
+| Percentage rollout | ✅ | ❌ | ✅ |
+| User targeting | ✅ | ❌ | ✅ |
+| Typed flag schema | ❌ | ❌ | ✅ |
+| No external service | ❌ | ✅ | ✅ |
 
 ---
 
@@ -26,7 +44,7 @@ npm install @flagskit/react
 
 ```typescript
 // flags.ts
-import { createFlagKit, defineFlags } from '@flagskit/react'
+import { createFlagKit } from '@flagskit/react'
 
 type AppFlags = {
   'new-checkout': boolean
@@ -34,26 +52,23 @@ type AppFlags = {
   'max-upload-mb': number
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature, Variant } =
-  createFlagKit<AppFlags>(
-    defineFlags<AppFlags>({
-      'new-checkout': {
-        defaultValue: false,
-        rules: [
-          { match: { role: 'beta' }, value: true },
-          { percentage: 20, value: true },
-        ],
-      },
-      'pricing-model': {
-        defaultValue: 'legacy',
-        rules: [{ match: { country: 'US' }, value: 'v2' }],
-      },
-      'max-upload-mb': {
-        defaultValue: 10,
-        rules: [{ match: { plan: 'pro' }, value: 100 }],
-      },
-    }),
-  )
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>({
+  'new-checkout': {
+    defaultValue: false,
+    rules: [
+      { match: { role: 'beta' }, value: true },
+      { percentage: 20, value: true },
+    ],
+  },
+  'pricing-model': {
+    defaultValue: 'legacy',
+    rules: [{ match: { country: 'US' }, value: 'v2' }],
+  },
+  'max-upload-mb': {
+    defaultValue: 10,
+    rules: [{ match: { plan: 'pro' }, value: 100 }],
+  },
+})
 ```
 
 **2. Wrap your app**
@@ -106,10 +121,6 @@ const model = useFlag('pricing-model')  // 'legacy' | 'v2' | 'v3'
 Primary API. Creates a fully typed set of React bindings bound to your flag schema. Import from `'./flags'` in your app — never import hooks directly from `@flagskit/react`.
 
 Returns: `{ FlagProvider, useFlag, useFlags, Feature, Variant }`
-
-### `defineFlags<T>(config)`
-
-Type-safe config factory. Validates flag definitions against your schema at compile time.
 
 ### `<FlagProvider context? adapter?>`
 

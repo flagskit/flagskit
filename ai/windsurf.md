@@ -6,25 +6,23 @@ This project uses FlagsKit (`@flagskit/react`) for feature flags.
 
 ```typescript
 // flags.ts
-import { createFlagKit, defineFlags } from '@flagskit/react'
+import { createFlagKit } from '@flagskit/react'
 
 type AppFlags = {
   'feature-name': boolean
   'variant': 'a' | 'b' | 'c'
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>(
-  defineFlags<AppFlags>({
-    'feature-name': {
-      defaultValue: false,
-      rules: [
-        { match: { role: 'beta' }, value: true },
-        { percentage: 20, value: true },
-      ],
-    },
-    'variant': { defaultValue: 'a' },
-  }),
-)
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>({
+  'feature-name': {
+    defaultValue: false,
+    rules: [
+      { match: { role: 'beta' }, value: true },
+      { percentage: 20, value: true },
+    ],
+  },
+  'variant': { defaultValue: 'a' },
+})
 ```
 
 ## Usage in components
