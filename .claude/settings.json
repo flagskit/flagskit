@@ -9,7 +9,10 @@
       "Bash(git commit*)",
       "Bash(git push)",
       "Bash(git branch*)",
-      "Bash(ls *)",
+      "Bash(ls*)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
       "Bash(node *)"
     ],
     "deny": [

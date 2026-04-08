@@ -8,7 +8,7 @@ Feature flags are defined once using `createFlagKit` and exported as typed bindi
 
 ```typescript
 // flags.ts
-import { createFlagKit, defineFlags } from '@flagskit/react'
+import { createFlagKit } from '@flagskit/react'
 
 type AppFlags = {
   'new-checkout': boolean
@@ -16,25 +16,26 @@ type AppFlags = {
   'max-upload-mb': number
 }
 
-export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>(
-  defineFlags<AppFlags>({
-    'new-checkout': {
-      defaultValue: false,
-      rules: [
-        { match: { role: 'beta' }, value: true },
-        { percentage: 20, value: true },
-      ],
-    },
-    'plan': {
-      defaultValue: 'free',
-      rules: [{ match: { tier: 'pro' }, value: 'pro' }],
-    },
-    'max-upload-mb': {
-      defaultValue: 10,
-      rules: [{ match: { tier: 'pro' }, value: 100 }],
-    },
-  }),
-)
+export const { FlagProvider, useFlag, useFlags, Feature, Variant } = createFlagKit<AppFlags>({
+  'new-checkout': {
+    defaultValue: false,
+    rules: [
+      { match: { role: 'beta' }, value: true },
+      { percentage: 20, value: true },
+    ],
+  },
+  'plan': {
+    defaultValue: 'free',
+    rules: [
+      { match: { tier: 'pro' }, value: 'pro' },
+      { match: { tier: 'enterprise' }, value: 'enterprise' },
+    ],
+  },
+  'max-upload-mb': {
+    defaultValue: 10,
+    rules: [{ match: { tier: 'pro' }, value: 100 }],
+  },
+})
 ```
 
 ## Provider

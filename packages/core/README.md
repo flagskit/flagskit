@@ -2,8 +2,6 @@
   <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/banner-core.png" alt="FlagsKit" width="100%" />
 </p>
 
-# @flagskit/core
-
 Feature flag evaluation engine. Zero dependencies. Works in React, Node.js, Edge, and any other runtime.
 
 **If you're building a React app, install [`@flagskit/react`](https://www.npmjs.com/package/@flagskit/react) instead** — it includes everything from core plus Provider, hooks, and components.
@@ -14,8 +12,6 @@ Use `@flagskit/core` directly when:
 - You're building your own framework adapter
 
 ```bash
-pnpm add @flagskit/core
-# or
 npm install @flagskit/core
 ```
 
@@ -24,7 +20,7 @@ npm install @flagskit/core
 ## Usage
 
 ```typescript
-import { defineFlags, evaluateAll, jsonAdapter } from '@flagskit/core'
+import { defineFlags, evaluate, evaluateAll, jsonAdapter } from '@flagskit/core'
 
 type AppFlags = {
   'new-checkout': boolean
