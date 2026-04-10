@@ -2,6 +2,12 @@
   <img src="https://raw.githubusercontent.com/flagskit/flagskit/main/media/banner-core.png" alt="FlagsKit" width="100%" />
 </p>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/@flagskit/core"><img src="https://img.shields.io/npm/v/@flagskit/core" alt="npm" /></a>
+  <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="zero dependencies" />
+  <a href="https://bundlejs.com/?q=%40flagskit%2Fcore&badge=detailed"><img src="https://deno.bundlejs.com/?q=@flagskit/core&badge=detailed" alt="core bundle size" /></a>
+</p>
+
 Feature flag evaluation engine. Zero dependencies. Works in React, Node.js, Edge, and any other runtime.
 
 **If you're building a React app, install [`@flagskit/react`](https://www.npmjs.com/package/@flagskit/react) instead** — it includes everything from core plus Provider, hooks, and components.

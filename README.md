@@ -6,9 +6,9 @@
   <a href="https://www.npmjs.com/package/@flagskit/react"><img src="https://img.shields.io/npm/v/@flagskit/react" alt="npm" /></a>
   <a href="https://github.com/flagskit/flagskit/actions"><img src="https://github.com/flagskit/flagskit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@flagskit/react" alt="license" /></a>
-  <img src="https://img.shields.io/badge/core-1.2KB-blue" alt="core bundle size" />
-  <img src="https://img.shields.io/badge/react-1.1KB-blue" alt="react bundle size" />
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="zero dependencies" />
+  <img src="https://img.shields.io/badge/core-0.9KB-blue" alt="core bundle size" />
+  <img src="https://img.shields.io/badge/react-1.4KB-blue" alt="react bundle size" />
 </p>
 
 Type-safe feature flags for React — percentage rollout and user targeting without any backend.
