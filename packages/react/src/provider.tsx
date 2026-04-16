@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { evaluateAll } from '@flagskit/core'

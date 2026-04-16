@@ -1,3 +1,5 @@
+'use client'
+
 import type { FlagSchema, FlagValue } from '@flagskit/core'
 import { useFlagKitContext } from './context'
 

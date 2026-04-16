@@ -11,13 +11,15 @@
   <img src="https://img.shields.io/badge/react-1.4KB-blue" alt="react bundle size" />
 </p>
 
-Type-safe feature flags for React — percentage rollout and user targeting without any backend.
+**Type-safe feature flags for React. Zero backend.**
+
+Percentage rollout, user targeting, A/B tests — all evaluated in-process. Works in Next.js, Remix, Astro, Vite, anywhere React works.
 
 ```bash
 npm install @flagskit/react
 ```
 
-> **[Try the live example on StackBlitz](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)**
+> **[Try the live example on StackBlitz](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)** · **[Next.js App Router example](./examples/next-app-router)**
 
 ---
 
@@ -27,15 +29,33 @@ Most tools force you to choose:
 
 - **SaaS platforms** (LaunchDarkly, Unleash, Flagsmith) — need their cloud service or a self-hosted server
 - **Context wrappers** (`flagged` and similar) — boolean flags only, no rollout, no targeting
+- **Vercel Flags SDK** — excellent, but Next.js + SvelteKit only, and real features (rollout, targeting) require a paid provider adapter
 
-FlagsKit sits in the middle: real rollout logic, no external service required.
+FlagsKit sits in the middle: real rollout logic, no external service required, works anywhere React works.
 
-|  | SaaS platforms | Context wrappers | **FlagsKit** |
-|---|---|---|---|
-| Percentage rollout | ✅ | ❌ | ✅ |
-| User targeting | ✅ | ❌ | ✅ |
-| Typed flag schema | ❌ | ❌ | ✅ |
-| No external service | ❌ | ✅ | ✅ |
+|  | SaaS platforms | Vercel Flags SDK | Context wrappers | **FlagsKit** |
+|---|---|---|---|---|
+| Percentage rollout built-in | ✅ | ❌ (code your own) | ❌ | ✅ |
+| User targeting built-in | ✅ | ❌ (code your own) | ❌ | ✅ |
+| Works without a backend | ❌ | ~ (provider needed for real features) | ✅ | ✅ |
+| Works outside Next.js | ✅ | ❌ (Next.js + SvelteKit only) | ✅ | ✅ |
+| Typed flag schema | ~ | ✅ | ❌ | ✅ |
+
+### FlagsKit vs Vercel Flags SDK
+
+Both are good. They optimize for different things.
+
+**Use Vercel Flags SDK when:**
+
+- You're all-in on Vercel and want Flags Explorer in production
+- You need the precompute pattern for static pages with flag variants
+- You're paying for a provider (LaunchDarkly, Statsig, Hypertune) and want their adapter ecosystem
+
+**Use FlagsKit when:**
+
+- You want percentage rollout and user targeting **declared as data** (rules array) rather than implemented imperatively in a `decide()` function
+- You deploy outside Vercel, or use React outside Next.js (Remix, Astro, Vite, React Native)
+- You want minimal setup — no `FLAGS_SECRET`, no provider, no explorer configuration
 
 ---
 
@@ -183,6 +203,26 @@ import { jsonAdapter, httpAdapter } from '@flagskit/react'
 // Later — fetch from your own API, with optional polling
 <FlagProvider adapter={httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })}>
 ```
+
+### Works in Next.js Server Components
+
+`@flagskit/core` is zero-dependency and isomorphic — call `evaluate()` directly in a Server Component. `@flagskit/react` is auto-marked `'use client'`, so hooks work on the client without any setup.
+
+```tsx
+// app/page.tsx — Server Component
+import { evaluate } from '@flagskit/core'
+import { cookies } from 'next/headers'
+import { flags } from '@/lib/flags'
+
+export default function Page() {
+  const isNew = evaluate(flags, 'new-homepage', {
+    role: cookies().get('role')?.value,
+  })
+  return isNew.value ? <NewHomepage /> : <OldHomepage />
+}
+```
+
+See [`examples/next-app-router`](./examples/next-app-router) for a full App Router setup with cookie-based context, server evaluation, and client hooks.
 
 ---
 

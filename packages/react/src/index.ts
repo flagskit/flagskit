@@ -8,8 +8,15 @@ export type { FlagProviderProps } from './provider'
 export type { FeatureProps } from './feature'
 export type { VariantProps } from './variant'
 
-// Re-export core utilities — React users only need @flagskit/react
-export { defineFlags, jsonAdapter, httpAdapter } from '@flagskit/core'
+// Re-export client-safe core utilities. `defineFlags` is intentionally NOT
+// re-exported here — it is needed both server-side (for Server Component
+// evaluation via @flagskit/core's `evaluate()`) and client-side. Because this
+// package is marked as a React Server Components client boundary, re-exporting
+// `defineFlags` from here would make it callable only on the client. Import it
+// from @flagskit/core instead:
+//
+//   import { defineFlags } from '@flagskit/core'
+export { jsonAdapter, httpAdapter } from '@flagskit/core'
 export type {
   FlagSchema,
   FlagValue,

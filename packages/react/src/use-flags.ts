@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo } from 'react'
 import type { FlagSchema } from '@flagskit/core'
 import { useFlagKitContext } from './context'
