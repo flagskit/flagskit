@@ -19,7 +19,7 @@ Percentage rollout, user targeting, A/B tests — all evaluated in-process. Work
 npm install @flagskit/react
 ```
 
-> **[Try the live example on StackBlitz](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)** · **[Next.js App Router example](./examples/next-app-router)**
+> **[Try the live example on StackBlitz →](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)**
 
 ---
 
@@ -332,6 +332,12 @@ curl -o AGENTS.md \
 | Windsurf | `curl -o .windsurf/rules/flagskit.md https://raw.githubusercontent.com/flagskit/flagskit/main/ai/windsurf.md` |
 
 See [`ai/`](./ai/) for all files.
+
+---
+
+## Examples
+
+- **[Vite + React](./examples/basic)** — minimal client-side setup with percentage rollout and targeting. [Open in StackBlitz →](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)
 
 ---
 
