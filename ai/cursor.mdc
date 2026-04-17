@@ -161,9 +161,34 @@ adapter={httpAdapter({ url: '/api/flags', headers: { Authorization: `Bearer ${to
 
 The endpoint must return `{ "flag-name": value, ... }`. Poll errors are silently ignored.
 
+## Next.js App Router
+
+`@flagskit/react` is marked `'use client'` (full bundle). For isomorphic flag files, import `defineFlags` from `@flagskit/core`:
+
+```typescript
+// lib/flags.ts — isomorphic
+import { defineFlags } from '@flagskit/core'  // NOT @flagskit/react
+export const flags = defineFlags<AppFlags>({ /* ... */ })
+```
+
+In Server Components, call `evaluate()` from core directly. There is no `@flagskit/next` package.
+
+```tsx
+// app/page.tsx
+import { evaluate } from '@flagskit/core'
+import { flags } from '@/lib/flags'
+
+export default function Page() {
+  const { value } = evaluate(flags, 'new-homepage', { userId: '123' })
+  return value ? <NewHomepage /> : <OldHomepage />
+}
+```
+
 ## Rules
 
 - Always import from `'./flags'` (your app's typed exports), not from `@flagskit/react` directly
+- In Next.js App Router, `defineFlags` must come from `@flagskit/core` (the react package is a client boundary — cannot be imported by Server Components)
+- For Server Component evaluation, use `evaluate()` from `@flagskit/core` — there is no `@flagskit/next` package
 - `userId` in context is required for percentage rollout to work
 - `defaultValue` type must match the flag's type in `AppFlags`
 - Rules are AND logic — all conditions in `match` must be true

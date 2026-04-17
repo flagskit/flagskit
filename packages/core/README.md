@@ -14,8 +14,9 @@ Feature flag evaluation engine. Zero dependencies. Works in React, Node.js, Edge
 
 Use `@flagskit/core` directly when:
 - You're integrating with a non-React framework (Vue, Svelte, vanilla JS)
-- You need server-side evaluation (Node.js, Edge runtime)
+- You need server-side evaluation (Next.js Server Components, Node.js, Edge runtime)
 - You're building your own framework adapter
+- You're defining flags in an isomorphic file that imports from both server and client (use `defineFlags` from here, not from `@flagskit/react`)
 
 ```bash
 npm install @flagskit/core

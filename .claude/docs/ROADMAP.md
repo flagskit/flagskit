@@ -1,123 +1,100 @@
-# FlagKit Roadmap
+# FlagsKit Roadmap
 
-## v0.1.0 — MVP
+## Positioning
 
-Goal: publishable to npm, usable in a real React app.
+> **Type-safe feature flags for React. Zero backend.**
 
-### @flagskit/core
+FlagsKit sits between heavy SaaS platforms (LaunchDarkly, Statsig, Vercel Flags SDK + provider) and simplistic toggles. The niche: declarative rules + percentage rollout + targeting, all evaluated in-process, with zero backend required. Framework-agnostic — works everywhere React works (Next.js, Remix, Astro, Vite, React Native).
 
-- [ ] `types.ts` — all TypeScript types (FlagSchema, FlagContext, FlagRule, FlagDefinition, FlagsConfig, FlagAdapter, EvaluationResult, MatchCondition, FlagValue)
-- [ ] `hash.ts` — MurmurHash3 32-bit implementation (inline, zero deps)
-- [ ] `define-flags.ts` — defineFlags<T>() factory (validates config, returns typed config)
-- [ ] `rules.ts` — matchRule() function (equality matching, AND logic)
-- [ ] `evaluate.ts` — evaluate() single flag, evaluateAll() all flags
-- [ ] `adapters/types.ts` — FlagAdapter interface
-- [ ] `adapters/json.ts` — jsonAdapter() static overrides
-- [ ] `index.ts` — re-exports
-- [ ] Tests: hash correctness & distribution, rule matching, evaluate with rules + percentage + overrides
-
-### @flagskit/react
-
-- [ ] `context.ts` — React context (FlagKitContext)
-- [ ] `provider.tsx` — FlagProvider component (accepts flags, context, adapter)
-- [ ] `use-flag.ts` — useFlag() hook (typed, throws if outside provider)
-- [ ] `use-flags.ts` — useFlags() hook (multiple flags)
-- [ ] `feature.tsx` — Feature component (conditional render, render prop support)
-- [ ] `index.ts` — re-exports
-- [ ] Tests: provider renders, useFlag returns correct value, Feature shows/hides, context changes trigger re-evaluation
-
-### Project setup
-
-- [ ] pnpm workspace with packages/core and packages/react
-- [ ] tsup build for both packages (ESM + CJS + DTS)
-- [ ] vitest config
-- [ ] tsconfig.base.json + per-package tsconfig
-- [ ] README.md with quickstart
-- [ ] LICENSE (MIT)
-- [ ] .gitignore
-- [ ] Basic CI (GitHub Actions: lint + test + build)
-
-### Package.json essentials for both packages
-
-```json
-{
-  "publishConfig": {
-    "access": "public"
-  }
-}
-```
-
-### README must include
-
-- One-line description
-- Install: `pnpm add @flagskit/core @flagskit/react`
-- 30-second quickstart (defineFlags → FlagProvider → useFlag)
-- Feature table (what FlagKit does vs doesn't)
-- API reference links
-- License
+**Not competing with Vercel Flags SDK head-on.** Different philosophy: we are declarative (rules as data), they are imperative (`decide()` as code). Different coverage: we are React-anywhere, they are Next.js + SvelteKit. Different audience: we are MVP/startup/self-hosted, they are Vercel-ecosystem + enterprise provider integrations.
 
 ---
 
-## v0.2.0 — Adapters & Variant
+## Released
 
-- [x] HTTP adapter (fetch + polling interval)
-- [ ] Env adapter (reads FF_* environment variables)
-- [ ] compose() to merge multiple adapters (priority order)
-- [x] `<Variant>` component (render map by flag value)
-- [ ] Evaluation events (onEvaluate callback)
-- [ ] Error boundary in Feature component (errorFallback prop)
-- [ ] evaluateSync() imperative API (no React)
-- [x] Bundle size audit — core 1.2KB gzip, react 1.1KB gzip (well under target)
+### v0.1.0 — MVP
+- `@flagskit/core` — evaluation engine, MurmurHash3, `defineFlags`, `evaluate`, `evaluateAll`, `matchRule`, `jsonAdapter`
+- `@flagskit/react` — `FlagProvider`, `useFlag`, `useFlags`, `Feature`
+- Zero dependencies in core; ESM + CJS + DTS; GitHub Actions CI; semantic-release to npm
 
----
+### v0.2.0 — Adapters & Variant
+- `httpAdapter` with fetch + optional polling
+- `<Variant>` component (multi-value render)
+- `createFlagKit` factory — pre-bound typed hooks and components
+- Bundle size audited: core 0.9KB gzip, react 1.4KB gzip
 
-## v0.3.0 — Next.js (`@flagskit/next`)
-
-- [ ] SSR-safe FlagProvider (serializes state to client)
-- [ ] getFlag() for Server Components
-- [ ] createFlagMiddleware() for Next.js middleware (rewrites based on flags)
-- [ ] Edge Runtime compatibility
-- [ ] App Router + Pages Router support
+### v0.3.0 — Docs & DX polish
+- Package READMEs as API source of truth
+- Brand assets, package banners
+- Dynamic bundle-size badges (bundlejs)
+- README conversion improvements (why before quickstart)
 
 ---
 
-## v0.4.0 — DevTools (`@flagskit/devtools`)
+## Planned
 
-- [ ] Floating panel UI (React component)
-- [ ] Show all flags with current values and which rule matched
-- [ ] Override any flag value in the panel (dev only)
-- [ ] Show current FlagContext
+### v0.4.0 — RSC compatibility & repositioning
+
+**Goal:** work cleanly inside Next.js App Router without shipping a Next.js-specific package. Reposition around the zero-backend value prop.
+
+- [ ] Add `'use client'` directives to React modules that use hooks/context (`provider.tsx`, `context.ts`, `use-flag.ts`, `use-flags.ts`, `feature.tsx`, `variant.tsx`, `create-flag-kit.tsx`)
+- [ ] Keep `@flagskit/react/index.ts` server-safe — it re-exports `defineFlags` / `jsonAdapter` / `httpAdapter` from core, which must remain importable from Server Components
+- [ ] `examples/next-app-router/` — App Router demo with client provider + server-side `evaluate()` from core directly
+- [ ] README repositioning: new tagline, `When to use FlagsKit vs alternatives` section with honest comparison to Vercel Flags SDK, LaunchDarkly, PostHog
+- [ ] Update `ai/` rules files with positioning context (when AI IDEs should recommend FlagsKit)
+
+**Explicitly NOT in v0.4:**
+- No `@flagskit/next` package. Server-side usage = call `evaluate()` from `@flagskit/core` directly. If a helper emerges as obviously needed from the example, we add it to core (not a separate package).
+- No Flags Explorer clone.
+- No precompute pattern — that's Vercel's angle.
+
+### v0.5.0 — DevTools
+
+**Goal:** in-app floating panel for inspecting and overriding flags during development.
+
+- [ ] Floating panel UI (React component) — Shadow DOM + inline styles, zero CSS conflicts
+- [ ] List all flags with current values, source (default / rule #N / override), and matched rule
+- [ ] Override any flag via the panel (persisted to localStorage)
+- [ ] Show current `FlagContext`
 - [ ] Evaluation log (which component requested which flag)
-- [ ] Export/import flag state (JSON) for bug reproduction
+- [ ] Lazy-load in production if accidentally left enabled; target <5KB gzip
 
----
+### v0.6.0 — Advanced targeting
 
-## v0.5.0 — Advanced Targeting
+**Goal:** close the expressiveness gap with rules-based SaaS platforms — still without a backend.
 
-- [ ] Match operators: $in, $notIn, $gt, $gte, $lt, $lte, $contains, $startsWith, $regex
-- [ ] Segments: reusable named groups of conditions
-- [ ] Scheduling: enable flag at specific datetime
-- [ ] Expiry: auto-disable flag after datetime
-- [ ] Stale flag detection (flag defined but never evaluated)
+- [ ] Match operators: `$in`, `$notIn`, `$gt`, `$gte`, `$lt`, `$lte`, `$contains`, `$startsWith`, `$regex`
+- [ ] Segments — reusable named condition groups
+- [ ] Scheduling — `enableAt` / `disableAt` datetime
+- [ ] Stale-flag detection — warn when a flag is defined but never evaluated in a render
 
----
+### v0.7.0 — Docs site
 
-## v1.0.0 — Stable
+**Goal:** proper documentation site to support adoption and SEO.
 
-- [ ] Unleash-compatible adapter
-- [ ] LaunchDarkly-compatible adapter
-- [ ] Real-time updates (SSE adapter, WebSocket adapter)
-- [ ] Analytics hooks (onEvaluate, onExposure for A/B tracking)
-- [ ] CLI tool: `flagkit lint` — detect unused flags, type mismatches
-- [ ] Documentation site (Astro or Nextra)
-- [ ] Comprehensive examples: basic React, Next.js App Router, Next.js Pages Router, Remix
+- [ ] Docs site (Astro or Nextra)
+- [ ] Interactive playground (flag config → live evaluation)
+- [ ] Migration guides (from Vercel Flags SDK, from homegrown setups, from LaunchDarkly)
+- [ ] `llms.txt` at site root for LLM-friendly discovery
+- [ ] Tutorial series: basic React, Next.js App Router, Remix, A/B testing recipe
+
+### v1.0.0 — Stable
+
+**Goal:** production-grade library with real-time updates, analytics, and maintenance tools.
+
+- [ ] Real-time adapters: SSE, WebSocket
+- [ ] Analytics hooks: `onEvaluate`, `onExposure` (for A/B-test event tracking)
+- [ ] CLI: `flagskit lint` — unused-flag detection, type mismatches, stale flags
+- [ ] Optional: `@flagskit/flags-sdk-adapter` — plug FlagsKit as a provider into Vercel Flags SDK for users who want both ecosystems
+- [ ] Stability commitment, semver guarantees
 
 ---
 
 ## Principles
 
-1. Every release must be independently useful — no "wait for v1.0"
+1. Every release independently useful — no "wait for v1.0"
 2. Zero dependencies in core — forever
 3. TypeScript types are a feature, not an afterthought
 4. Test coverage >90% for core evaluation logic
 5. README-driven development — if you can't explain it simply, redesign it
+6. **Don't compete head-on with Vercel Flags SDK.** Different philosophy, different audience. Be complementary.

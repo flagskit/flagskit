@@ -10,13 +10,15 @@
   <a href="https://bundlejs.com/?q=%40flagskit%2Freact&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22react%22%5D%7D%7D&badge=detailed"><img src="https://deno.bundlejs.com/?q=@flagskit/react&config={%22esbuild%22:{%22external%22:[%22react%22]}}&badge=detailed" alt="react bundle size" /></a>
 </p>
 
-Type-safe feature flags for React — percentage rollout and user targeting without any backend.
+**Type-safe feature flags for React. Zero backend.**
+
+Percentage rollout, user targeting, A/B tests — all evaluated in-process. Works in Next.js, Remix, Astro, Vite, anywhere React works.
 
 ```bash
 npm install @flagskit/react
 ```
 
-> **[Try the live example on StackBlitz](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)**
+> **[Try the live example on StackBlitz](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)** · **[Next.js App Router example](https://github.com/flagskit/flagskit/tree/main/examples/next-app-router)**
 
 ---
 
@@ -227,6 +229,29 @@ import { httpAdapter } from '@flagskit/react'
 ```
 
 The endpoint must return a flat JSON object: `{ "flag-name": value, ... }`.
+
+---
+
+## Next.js App Router
+
+`@flagskit/react` is auto-marked as a React Server Components client boundary (all hooks and components work inside Client Components out of the box). For server-side evaluation, use `@flagskit/core` directly — it's isomorphic and has zero dependencies:
+
+```tsx
+// lib/flags.ts — isomorphic, works on both server and client
+import { defineFlags } from '@flagskit/core'  // NOT @flagskit/react
+export const flags = defineFlags<AppFlags>({ /* ... */ })
+
+// app/page.tsx — Server Component
+import { evaluate } from '@flagskit/core'
+import { flags } from '@/lib/flags'
+
+export default function Page() {
+  const { value } = evaluate(flags, 'new-homepage', { userId: 'u1' })
+  return value ? <NewHomepage /> : <OldHomepage />
+}
+```
+
+See [`examples/next-app-router`](https://github.com/flagskit/flagskit/tree/main/examples/next-app-router) for a complete setup.
 
 ---
 

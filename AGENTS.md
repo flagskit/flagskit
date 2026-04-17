@@ -163,9 +163,55 @@ adapter={httpAdapter({ url: '/api/flags', headers: { Authorization: `Bearer ${to
 The endpoint must return a flat JSON object: `{ "flag-name": value, ... }`.
 Poll errors are silently ignored — last known values stay active.
 
+## Next.js App Router
+
+`@flagskit/react` is a React Server Components client boundary — its entire bundle is marked `'use client'`. For isomorphic code that must run in both Server and Client Components, import from `@flagskit/core` instead.
+
+**Define flags using `@flagskit/core`, not `@flagskit/react`:**
+
+```typescript
+// lib/flags.ts — imported by both Server and Client Components
+import { defineFlags } from '@flagskit/core'  // NOT @flagskit/react
+
+export const flags = defineFlags<AppFlags>({ /* ... */ })
+```
+
+**In Server Components, call `evaluate()` directly from core:**
+
+```tsx
+// app/page.tsx
+import { cookies } from 'next/headers'
+import { evaluate } from '@flagskit/core'
+import { flags } from '@/lib/flags'
+
+export default function Page() {
+  const userId = cookies().get('userId')?.value
+  const { value } = evaluate(flags, 'new-homepage', { userId })
+  return value ? <NewHomepage /> : <OldHomepage />
+}
+```
+
+**Client providers live in a `'use client'` wrapper:**
+
+```tsx
+// app/providers.tsx
+'use client'
+import { FlagProvider } from '@flagskit/react'
+import { flags } from '@/lib/flags'
+import type { FlagContext } from '@flagskit/core'
+
+export function Providers({ context, children }: { context: FlagContext; children: React.ReactNode }) {
+  return <FlagProvider flags={flags} context={context}>{children}</FlagProvider>
+}
+```
+
+There is no `@flagskit/next` package — `@flagskit/core` is zero-dependency and isomorphic, so nothing Next.js-specific is needed.
+
 ## Rules to follow
 
 - Always import `useFlag`, `Feature`, `FlagProvider` from `'./flags'` (app's typed exports), not from `@flagskit/react` directly
+- In Next.js App Router, import `defineFlags` from `@flagskit/core` (not `@flagskit/react`) — the react package is a client boundary and cannot be imported by Server Components
+- For Server Component evaluation, call `evaluate()` from `@flagskit/core` directly — do NOT look for a `@flagskit/next` package, it does not exist
 - `userId` in context is required for percentage rollout — without it, percentage rules are skipped
 - `defaultValue` must be assignable to the flag's type in `AppFlags`
 - Never put sensitive logic behind client-side flags — they are visible in the browser

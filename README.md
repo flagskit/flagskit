@@ -11,13 +11,15 @@
   <img src="https://img.shields.io/badge/react-1.4KB-blue" alt="react bundle size" />
 </p>
 
-Type-safe feature flags for React — percentage rollout and user targeting without any backend.
+**Type-safe feature flags for React. Zero backend.**
+
+Percentage rollout, user targeting, A/B tests — all evaluated in-process. Works in Next.js, Remix, Astro, Vite, anywhere React works.
 
 ```bash
 npm install @flagskit/react
 ```
 
-> **[Try the live example on StackBlitz](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)**
+> **[Try the live example on StackBlitz →](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)**
 
 ---
 
@@ -27,15 +29,17 @@ Most tools force you to choose:
 
 - **SaaS platforms** (LaunchDarkly, Unleash, Flagsmith) — need their cloud service or a self-hosted server
 - **Context wrappers** (`flagged` and similar) — boolean flags only, no rollout, no targeting
+- **Vercel Flags SDK** — excellent, but Next.js + SvelteKit only. Rollout and targeting live in adapters — Vercel's own (Edge Config + dashboard) or third-party (LaunchDarkly, Statsig, Hypertune) — not in the core SDK
 
-FlagsKit sits in the middle: real rollout logic, no external service required.
+FlagsKit sits in the middle: real rollout logic, no external service required, works anywhere React works.
 
-|  | SaaS platforms | Context wrappers | **FlagsKit** |
-|---|---|---|---|
-| Percentage rollout | ✅ | ❌ | ✅ |
-| User targeting | ✅ | ❌ | ✅ |
-| Typed flag schema | ❌ | ❌ | ✅ |
-| No external service | ❌ | ✅ | ✅ |
+|  | SaaS platforms | Vercel Flags SDK | Context wrappers | **FlagsKit** |
+|---|---|---|---|---|
+| Percentage rollout built-in | ✅ | ❌ (code your own) | ❌ | ✅ |
+| User targeting built-in | ✅ | ❌ (code your own) | ❌ | ✅ |
+| Works without a backend | ❌ | ~ (provider needed for real features) | ✅ | ✅ |
+| Works outside Next.js | ✅ | ❌ (Next.js + SvelteKit only) | ✅ | ✅ |
+| Typed flag schema | ~ | ✅ | ❌ | ✅ |
 
 ---
 
@@ -184,6 +188,26 @@ import { jsonAdapter, httpAdapter } from '@flagskit/react'
 <FlagProvider adapter={httpAdapter({ url: '/api/flags', refreshInterval: 60_000 })}>
 ```
 
+### Works in Next.js Server Components
+
+`@flagskit/core` is zero-dependency and isomorphic — call `evaluate()` directly in a Server Component. `@flagskit/react` is auto-marked `'use client'`, so hooks work on the client without any setup.
+
+```tsx
+// app/page.tsx — Server Component
+import { evaluate } from '@flagskit/core'
+import { cookies } from 'next/headers'
+import { flags } from '@/lib/flags'
+
+export default function Page() {
+  const isNew = evaluate(flags, 'new-homepage', {
+    role: cookies().get('role')?.value,
+  })
+  return isNew.value ? <NewHomepage /> : <OldHomepage />
+}
+```
+
+See [`examples/next-app-router`](./examples/next-app-router) for a full App Router setup with cookie-based context, server evaluation, and client hooks.
+
 ---
 
 ## API
@@ -292,6 +316,12 @@ curl -o AGENTS.md \
 | Windsurf | `curl -o .windsurf/rules/flagskit.md https://raw.githubusercontent.com/flagskit/flagskit/main/ai/windsurf.md` |
 
 See [`ai/`](./ai/) for all files.
+
+---
+
+## Examples
+
+- **[Vite + React](./examples/basic)** — minimal client-side setup with percentage rollout and targeting. [Open in StackBlitz →](https://stackblitz.com/github/flagskit/flagskit/tree/main/examples/basic?file=src/App.tsx)
 
 ---
 

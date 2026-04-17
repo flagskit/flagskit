@@ -1,3 +1,5 @@
+'use client'
+
 import type { ReactNode, ReactElement } from 'react'
 import type { FlagSchema, FlagsConfig, FlagContext, FlagAdapter } from '@flagskit/core'
 import { FlagProvider as RawFlagProvider } from './provider'

@@ -1,3 +1,5 @@
+'use client'
+
 import type { ReactNode } from 'react'
 import type { FlagSchema, FlagValue } from '@flagskit/core'
 import { useFlag } from './use-flag'
