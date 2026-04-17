@@ -29,7 +29,7 @@ Most tools force you to choose:
 
 - **SaaS platforms** (LaunchDarkly, Unleash, Flagsmith) — need their cloud service or a self-hosted server
 - **Context wrappers** (`flagged` and similar) — boolean flags only, no rollout, no targeting
-- **Vercel Flags SDK** — excellent, but Next.js + SvelteKit only, and real features (rollout, targeting) require a paid provider adapter
+- **Vercel Flags SDK** — excellent, but Next.js + SvelteKit only. Rollout and targeting live in adapters — Vercel's own (Edge Config + dashboard) or third-party (LaunchDarkly, Statsig, Hypertune) — not in the core SDK
 
 FlagsKit sits in the middle: real rollout logic, no external service required, works anywhere React works.
 
@@ -40,22 +40,6 @@ FlagsKit sits in the middle: real rollout logic, no external service required, w
 | Works without a backend | ❌ | ~ (provider needed for real features) | ✅ | ✅ |
 | Works outside Next.js | ✅ | ❌ (Next.js + SvelteKit only) | ✅ | ✅ |
 | Typed flag schema | ~ | ✅ | ❌ | ✅ |
-
-### FlagsKit vs Vercel Flags SDK
-
-Both are good. They optimize for different things.
-
-**Use Vercel Flags SDK when:**
-
-- You're all-in on Vercel and want Flags Explorer in production
-- You need the precompute pattern for static pages with flag variants
-- You're paying for a provider (LaunchDarkly, Statsig, Hypertune) and want their adapter ecosystem
-
-**Use FlagsKit when:**
-
-- You want percentage rollout and user targeting **declared as data** (rules array) rather than implemented imperatively in a `decide()` function
-- You deploy outside Vercel, or use React outside Next.js (Remix, Astro, Vite, React Native)
-- You want minimal setup — no `FLAGS_SECRET`, no provider, no explorer configuration
 
 ---
 
